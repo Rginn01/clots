@@ -1,10 +1,9 @@
-# Clots Manager v2
+# Clots Manager v3 (compact rebuild)
 
-Novidades:
-- **Escudos** (upload por time) e **temas** de layout.
-- **Elencos com jogadores** (overall, posição, gols, cartões, lesões/suspensões).
-- **Artilharia da temporada** (top 30 geral).
-- **Playoffs** (opcional, top 4 de cada divisão decide o campeão).
-- UI **mobile** com menu lateral, cards e toques maiores.
+Inclui:
+- **Limpar dados** (reinicia tudo);
+- **Animação de rodada** com botão **Pular**;
+- **Hall da Fama** exibindo apenas campeões (contagem de taças A/B/C/Copa);
+- **Truste BK**: só libera após a 1ª temporada; ao fechar temporada a copa é gerada automaticamente com os primeiros *N* de cada divisão.
 
-Tudo salvo em LocalStorage (exportar/importar JSON). Abra `index.html` no navegador.
+Abra `index.html` no navegador. Salva tudo no LocalStorage (exportar/importar JSON).

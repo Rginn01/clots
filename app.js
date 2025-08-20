@@ -13,6 +13,44 @@ function randn(mean=0, sigma=1){
 }
 
 // ===== storage =====
+
+function deepClone(x){ return JSON.parse(JSON.stringify(x)); }
+
+function sanityCheck(autoFix=true){
+  let repaired = false;
+  for(const d of state.divisions){
+    if(!Array.isArray(d.teams) || d.teams.length===0){
+      // tentar reconstruir a partir da última tabela conhecida
+      const source = (d.table && d.table.length)? d.table : [];
+      if(source.length){
+        const rebuilt = source.map((r,i)=>({
+          id: (crypto.randomUUID?crypto.randomUUID():String(Date.now())+i),
+          name: r.name,
+          rating: 72 + (r.P||0)*0.2 + (r.SG||0)*0.5,
+          titles: {A:0,B:0,C:0},
+          cupTitles: 0
+        }));
+        d.teams = rebuilt;
+        repaired = true;
+      }
+    } else {
+      // remover duplicados por id e itens inválidos
+      const seen = new Set(); const clean=[];
+      for(const t of d.teams){
+        if(!t || !t.id || !t.name){ continue; }
+        if(seen.has(t.id)) continue;
+        if(typeof t.rating!=='number' || !isFinite(t.rating)){ t.rating=72; }
+        seen.add(t.id); clean.push(t);
+      }
+      if(clean.length !== d.teams.length){ d.teams = clean; repaired = true; }
+    }
+    if(!Array.isArray(d.fixtures)){ d.fixtures=[]; repaired=true; }
+    if(typeof d.round!=='number'){ d.round=0; repaired=true; }
+  }
+  if(repaired && autoFix){ saveState(); }
+  return repaired;
+}
+
 const STORAGE_KEY = "clots-manager-v1";
 function loadState(){
   try{
@@ -24,6 +62,7 @@ function loadState(){
 function saveState(){
   localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
   render();
+sanityCheck(true);
 }
 
 // ===== initial data (a,b,c) =====
@@ -193,37 +232,31 @@ function playAllRounds(div){
 }
 
 // ===== season close (promotions & relegations) =====
+
 function endSeason(){
-  // fecha cada divisão, registra campeão
   const summary = { season: state.season, champions: {}, tables: {}, date: new Date().toISOString() };
   for(const d of state.divisions){
-    // garante tabela final
     while(d.round < d.fixtures.length){ playNextRound(d); }
-    const champ = d.table[0]; // primeiro colocado
+    const champ = d.table[0];
     const team = teamById(champ.id);
     team.titles[d.code] = (team.titles[d.code]||0)+1;
     summary.champions[d.code] = team.name;
-    summary.tables[d.code] = d.table.map(r=>({name:r.name,P:r.P,SG:r.SG,GP:r.GP,GC:r.GC}));
+    summary.tables[d.code] = d.table.map(r=>({id:r.id,name:r.name,P:r.P,SG:r.SG,GP:r.GP,GC:r.GC}));
   }
 
-  // movimenta times: 4 sobem, 4 caem (A<->B, B<->C)
   function moveBetween(upper, lower){
-    upper.teams.sort((a,b)=>{
-      // ordenar pela tabela final
-      const ra = upper.table.find(r=>r.id===a.id);
-      const rb = upper.table.find(r=>r.id===b.id);
-      return ra.P - rb.P || ra.SG - rb.SG;
-    });
-    lower.teams.sort((a,b)=>{
-      const ra = lower.table.find(r=>r.id===a.id);
-      const rb = lower.table.find(r=>r.id===b.id);
-      return rb.P - ra.P || rb.SG - ra.SG;
-    });
-    const down = upper.teams.slice(0,4);   // piores
-    const up   = lower.teams.slice(0,4);   // melhores
+    // usa posições finais diretamente da tabela (sem reordenar arrays base)
+    const bottom4Ids = upper.table.slice(-4).map(r=>r.id);
+    const top4Ids    = lower.table.slice(0,4).map(r=>r.id);
 
-    upper.teams = upper.teams.slice(4).concat(up);
-    lower.teams = lower.teams.slice(4).concat(down);
+    const down = bottom4Ids.map(id=> upper.teams.find(t=>t.id===id)).filter(Boolean);
+    const up   = top4Ids.map(id=> lower.teams.find(t=>t.id===id)).filter(Boolean);
+
+    const upperKeep = upper.teams.filter(t=> !bottom4Ids.includes(t.id));
+    const lowerKeep = lower.teams.filter(t=> !top4Ids.includes(t.id));
+
+    upper.teams = upperKeep.concat(up);
+    lower.teams = lowerKeep.concat(down);
   }
   const A = state.divisions.find(d=>d.code==="A");
   const B = state.divisions.find(d=>d.code==="B");
@@ -231,7 +264,6 @@ function endSeason(){
   moveBetween(A,B);
   moveBetween(B,C);
 
-  // zerar fixtures e ruído sazonal
   for(const d of state.divisions){
     d.fixtures = []; d.round = 0; d.table = [];
     for(const t of d.teams){ delete t._seasonMul; }
@@ -243,23 +275,19 @@ function endSeason(){
 }
 
 // ===== CUP =====
+
 function seedCup(perDivision){
   state.cup = { rounds:[], alive:[], stage:0, seasonOf: state.season, champion:null, perDivision };
   const picks = [];
   for(const d of state.divisions){
-    // pega top N (se não tiver tabela da temporada, usa rating)
-    let ordered = d.table?.length ? d.table.slice() : d.teams.map(t=>({id:t.id,name:t.name,P:0,SG:0}));
-    // garantir que tenha ids nos objetos
-    ordered = ordered.map(r=>({ ...r, id: teamByName(r.name).id }));
+    let ordered = (d.table && d.table.length) ? d.table.slice() : d.teams.map(t=>({id:t.id,name:t.name,P:0,SG:0}));
     const take = Math.min(perDivision, ordered.length);
-    for(let i=0;i<take;i++){ picks.push( teamById(ordered[i].id) ); }
+    for(let i=0;i<take;i++){ picks.push( ordered[i].id ); }
   }
-  // se sobrar quantidade não potência de 2, corta até o múltiplo anterior
-  const pow2 = 1<<Math.floor(Math.log2(picks.length));
+  const pow2 = 1<<Math.floor(Math.log2(Math.max(2, picks.length)));
   const field = picks.slice(0, pow2);
-  // embaralhar
   field.sort(()=>rnd()-0.5);
-  state.cup.alive = field.map(t=>t.id);
+  state.cup.alive = field.slice();
   state.cup.rounds = []; state.cup.stage = 0; state.cup.champion = null;
   saveState();
 }
@@ -472,6 +500,7 @@ let state = loadState() || seedTeams();
 ensureFixtures();
 computeTable(state.divisions[0]); computeTable(state.divisions[1]); computeTable(state.divisions[2]);
 render();
+sanityCheck(true);
 
 // dashboard buttons
 $('#btnNextRoundAll').onclick = ()=>{ state.divisions.forEach(d=>playNextRound(d)); saveState(); };
@@ -484,6 +513,7 @@ $('#btnCupRound').onclick = ()=>{ playCupRound(); };
 $('#btnCupAll').onclick = ()=>{ playCupAll(); };
 
 // settings bindings
+$('#btnSanity').onclick = ()=>{ const fixed = sanityCheck(true); alert(fixed? 'Dados corrigidos.' : 'Tudo ok!'); };
 $('#cfgAvgGoals').onchange = ()=>{ state.config.avgGoals = parseFloat($('#cfgAvgGoals').value); saveState(); };
 $('#cfgHomeEdge').onchange = ()=>{ state.config.homeEdge = parseFloat($('#cfgHomeEdge').value); saveState(); };
 $('#cfgPerfSigma').onchange = ()=>{ state.config.perfSigma = parseFloat($('#cfgPerfSigma').value); saveState(); };

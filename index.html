@@ -2,17 +2,18 @@
 <html lang="pt-BR">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Clots — Gerenciador de Campeonatos</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Clots Manager v2</title>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
 <header class="topbar">
+  <button class="hamburger" id="btnMenu" aria-label="Abrir menu">☰</button>
   <div class="brand">
     <span class="logo">⚽</span>
     <div>
-      <h1>Clots Manager</h1>
-      <p class="muted">Ligas A/B/C ilimitadas • Pontos corridos (2 turnos) • Copa Truste BK • Salva no seu navegador</p>
+      <h1>Clots Manager <span class="pill">v2</span></h1>
+      <p class="muted">Ligas ilimitadas • V2: escudos, elencos, artilharia, lesões, playoffs, mobile+</p>
     </div>
   </div>
   <nav class="actions">
@@ -25,9 +26,10 @@
 </header>
 
 <main class="container">
-  <aside class="sidebar">
+  <aside class="sidebar" id="sidebar">
     <button class="tab-btn active" data-tab="dashboard">📊 Painel</button>
     <button class="tab-btn" data-tab="divisions">🏆 Divisões</button>
+    <button class="tab-btn" data-tab="squads">👥 Elencos & Artilharia</button>
     <button class="tab-btn" data-tab="cup">🥇 Copa Truste BK</button>
     <button class="tab-btn" data-tab="history">🕑 Histórico</button>
     <button class="tab-btn" data-tab="settings">⚙️ Configurações</button>
@@ -39,7 +41,7 @@
       <div class="toolbar">
         <button id="btnNextRoundAll">▶ Próxima Rodada (todas)</button>
         <button id="btnPlayAll">⏩ Completar Temporada (todas)</button>
-        <button id="btnNewSeason">🔁 Fechar temporada e promover/rebaixar</button>
+        <button id="btnNewSeason">🔁 Fechar temporada</button>
       </div>
       <div id="dashDivisions" class="grid"></div>
     </section>
@@ -47,6 +49,19 @@
     <!-- Divisions -->
     <section id="tab-divisions" class="tab">
       <div id="divisionsArea"></div>
+    </section>
+
+    <!-- Squads/Scorers -->
+    <section id="tab-squads" class="tab">
+      <div class="toolbar">
+        <label>Time: <select id="teamSelect"></select></label>
+        <button id="btnHealAll">⛑️ Curar todos (debug)</button>
+      </div>
+      <div id="squadArea" class="grid"></div>
+      <div class="card">
+        <h3>Artilharia da Temporada</h3>
+        <div id="scorersArea"></div>
+      </div>
     </section>
 
     <!-- CUP -->
@@ -67,33 +82,35 @@
 
     <!-- Settings -->
     <section id="tab-settings" class="tab">
-      <h2>Parâmetros de Simulação</h2>
+      <h2>Parâmetros e Layout</h2>
       <div class="grid grid2">
-        <label>Média de gols por jogo
-          <input id="cfgAvgGoals" type="number" step="0.1" value="2.7">
-        </label>
-        <label>Vantagem de mando (0–0.3)
-          <input id="cfgHomeEdge" type="number" step="0.01" value="0.12">
-        </label>
-        <label>Oscilação por partida (desvio, 0–0.3)
-          <input id="cfgPerfSigma" type="number" step="0.01" value="0.08">
-        </label>
-        <label>Ruído sazonal (0–0.2)
-          <input id="cfgSeasonSigma" type="number" step="0.01" value="0.05">
+        <label>Média de gols por jogo <input id="cfgAvgGoals" type="number" step="0.1" value="2.7"></label>
+        <label>Vantagem de mando (0–0.3) <input id="cfgHomeEdge" type="number" step="0.01" value="0.12"></label>
+        <label>Oscilação por partida (0–0.3) <input id="cfgPerfSigma" type="number" step="0.01" value="0.08"></label>
+        <label>Ruído sazonal (0–0.2) <input id="cfgSeasonSigma" type="number" step="0.01" value="0.05"></label>
+        <label>Playoffs (top4 definem campeão) <input id="cfgPlayoffs" type="checkbox"></label>
+        <label>Tema
+          <select id="cfgTheme">
+            <option value="ocean">Ocean</option>
+            <option value="grass">Grass</option>
+            <option value="noir">Noir</option>
+            <option value="violet">Violet</option>
+          </select>
         </label>
       </div>
-      <p class="muted">Tudo é salvo automaticamente. O app usa armazenamento local (LocalStorage) — você pode exportar para backup.</p><button id="btnSanity" style="margin-top:8px">🛠️ Verificar & corrigir dados</button>
-      <details>
-        <summary>Times & ratings</summary>
-        <div id="teamsEditor"></div>
-      </details>
+      <p class="muted">Tudo salvo no navegador (LocalStorage). Você pode exportar para backup.</p>
+
+      <h2>Divisões e Times</h2>
+      <div class="toolbar">
+        <button id="btnAddDivision">➕ Nova divisão</button>
+      </div>
+      <div id="teamsEditor"></div>
+      <button id="btnSanity" style="margin-top:8px">🛠️ Verificar & corrigir dados</button>
     </section>
   </section>
 </main>
 
-<footer class="foot">
-  Feito para simulações infinitas 💙 — Guarda tudo no seu navegador.
-</footer>
+<footer class="foot">Feito para jogar no celular ou PC — v2</footer>
 
 <script src="app.js"></script>
 </body>

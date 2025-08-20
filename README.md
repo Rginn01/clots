@@ -1,10 +1,10 @@
-# Clots Manager (offline)
+# Clots Manager v2
 
-App de uma página para gerenciar ligas A/B/C (pontos corridos com 2 turnos) e a Copa **Truste BK**.
+Novidades:
+- **Escudos** (upload por time) e **temas** de layout.
+- **Elencos com jogadores** (overall, posição, gols, cartões, lesões/suspensões).
+- **Artilharia da temporada** (top 30 geral).
+- **Playoffs** (opcional, top 4 de cada divisão decide o campeão).
+- UI **mobile** com menu lateral, cards e toques maiores.
 
-- Gera tabelas e simula resultados com algoritmo probabilístico (Poisson), usando **força** dos times + vantagem de mando + oscilação.
-- Salva tudo no `LocalStorage` (funciona offline). Exporte/importe backups em JSON.
-- Promove/rebaixa **4** times ao fechar a temporada, e registra os campeões.
-- A Copa aceita **N** primeiros de cada divisão (padrão 16); é mata‑mata até o campeão.
-
-Abra `index.html` no seu navegador e divirta‑se.
+Tudo salvo em LocalStorage (exportar/importar JSON). Abra `index.html` no navegador.

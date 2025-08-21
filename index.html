@@ -1,110 +1,95 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <title>Clots Manager v3</title>
-  <link rel="stylesheet" href="style.css" />
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
+<title>Clots Manager v4</title>
+<link rel="stylesheet" href="style.css"/>
 </head>
 <body>
 <header class="topbar">
-  <button class="hamburger" id="btnMenu" aria-label="Abrir menu">☰</button>
-  <div class="brand">
-    <span class="logo">⚽</span>
-    <div>
-      <h1>Clots Manager <span class="pill">v3</span></h1>
-      <p class="muted">Ligas ilimitadas • v3: limpar dados, animações por rodada, hall da fama, copa pós-temporada</p>
-    </div>
-  </div>
-  <nav class="actions">
-    <button id="btnSave">💾 Exportar</button>
-    <label class="import">
-      ⤒ Importar
-      <input type="file" id="fileImport" accept=".json,application/json" />
-    </label>
-    <button id="btnClear" class="danger">🧹 Limpar dados</button>
-  </nav>
-</header>
-
-<main class="container">
-  <aside class="sidebar" id="sidebar">
-    <button class="tab-btn active" data-tab="dashboard">📊 Painel</button>
-    <button class="tab-btn" data-tab="divisions">🏆 Divisões</button>
-    <button class="tab-btn" data-tab="cup">🥇 Copa Truste BK</button>
-    <button class="tab-btn" data-tab="history">🕑 Histórico & Hall da Fama</button>
-    <button class="tab-btn" data-tab="settings">⚙️ Configurações</button>
-  </aside>
-
-  <section class="content">
-    <section id="tab-dashboard" class="tab visible">
-      <div class="toolbar">
-        <button id="btnNextRoundAll">▶ Próxima Rodada (todas)</button>
-        <button id="btnNextRoundAnim">🎬 Rodada com animação (todas)</button>
-        <button id="btnPlayAll">⏩ Completar Temporada (todas)</button>
-        <button id="btnNewSeason">🔁 Fechar temporada</button>
-      </div>
-      <div id="dashDivisions" class="grid"></div>
-    </section>
-
-    <section id="tab-divisions" class="tab">
-      <div id="divisionsArea"></div>
-    </section>
-
-    <section id="tab-cup" class="tab">
-      <div id="cupInfo" class="card small"></div>
-      <div class="toolbar">
-        <label>Times por divisão: <input id="cupTake" type="number" min="2" max="64" value="16" /></label>
-        <button id="btnCupSeed">🎲 Montar Copa</button>
-        <button id="btnCupRound">▶ Jogar próxima fase</button>
-        <button id="btnCupAll">⏩ Jogar até o campeão</button>
-      </div>
-      <div id="cupArea"></div>
-    </section>
-
-    <section id="tab-history" class="tab">
-      <div id="hallArea"></div>
-      <hr class="sep"/>
-      <div id="historyArea"></div>
-    </section>
-
-    <section id="tab-settings" class="tab">
-      <h2>Parâmetros e Layout</h2>
-      <div class="grid grid2">
-        <label>Média de gols por jogo <input id="cfgAvgGoals" type="number" step="0.1" value="2.7"></label>
-        <label>Vantagem de mando (0–0.3) <input id="cfgHomeEdge" type="number" step="0.01" value="0.12"></label>
-        <label>Oscilação por partida (0–0.3) <input id="cfgPerfSigma" type="number" step="0.01" value="0.08"></label>
-        <label>Ruído sazonal (0–0.2) <input id="cfgSeasonSigma" type="number" step="0.01" value="0.05"></label>
-        <label>Playoffs (top4) <input id="cfgPlayoffs" type="checkbox"></label>
-        <label>Tema
-          <select id="cfgTheme">
-            <option value="ocean">Ocean</option>
-            <option value="grass">Grass</option>
-            <option value="noir">Noir</option>
-            <option value="violet">Violet</option>
-          </select>
-        </label>
-      </div>
-      <p class="muted">Tudo salvo no navegador (LocalStorage). Você pode exportar para backup.</p>
-      <h2>Divisões e Times</h2>
-      <div id="teamsEditor" class="card small">Editor simplificado nesta v3 (v2 tem elencos). </div>
-      <button id="btnSanity" style="margin-top:8px">🛠️ Verificar & corrigir dados</button>
-    </section>
-  </section>
-</main>
-
-<footer class="foot">Imersão + Mobile — v3</footer>
-
-<div id="overlay" class="overlay hidden">
-  <div class="ov-card">
-    <div class="ov-head">
-      <h3>Rodada em andamento</h3>
-      <button id="ovSkip">Pular animação</button>
-    </div>
-    <div id="ovList" class="ov-list"></div>
-    <div class="ov-foot small">Animação visual; os resultados são do simulador.</div>
-  </div>
+<button class="hamburger" id="btnMenu" aria-label="Abrir menu">☰</button>
+<div class="brand">
+<span class="logo">⚽</span>
+<div>
+<h1>Clots Manager <span class="pill">v4</span></h1>
+<p class="muted">Mobile e PC • Copa pós-temporada • Playoffs opcionais</p>
 </div>
-
+</div>
+<nav class="actions">
+<button id="btnClear" class="danger">🧹 Limpar dados</button>
+</nav>
+</header>
+<main class="container">
+<aside class="sidebar" id="sidebar">
+<button class="tab-btn active" data-tab="dashboard">📊 Painel</button>
+<button class="tab-btn" data-tab="divisions">🏆 Divisões</button>
+<button class="tab-btn" data-tab="cup">🥇 Copa Truste BK</button>
+<button class="tab-btn" data-tab="history">🏅 Hall & Histórico</button>
+<button class="tab-btn" data-tab="settings">⚙️ Configurações</button>
+</aside>
+<section class="content">
+<section id="tab-dashboard" class="tab visible">
+<div class="toolbar">
+<button id="btnNextRoundAll">▶ Próxima Rodada</button>
+<button id="btnNextRoundAnim">🎬 Rodada com animação</button>
+<button id="btnPlayAll">⏩ Completar Temporada</button>
+<button id="btnNewSeason">🔁 Fechar Temporada</button>
+</div>
+<div id="dashDivisions" class="grid"></div>
+</section>
+<section id="tab-divisions" class="tab">
+<div id="divisionsArea"></div>
+</section>
+<section id="tab-cup" class="tab">
+<div id="cupInfo" class="card small"></div>
+<div class="toolbar">
+<label>Times por divisão <input id="cupTake" type="number" min="2" max="64" value="16"/></label>
+<button id="btnCupSeed">🎲 Montar Copa</button>
+<button id="btnCupRound">▶ Próxima Fase</button>
+<button id="btnCupAll">⏩ Até o Campeão</button>
+</div>
+<div id="cupArea"></div>
+</section>
+<section id="tab-history" class="tab">
+<div id="hallArea"></div>
+<hr class="sep"/>
+<div id="historyArea"></div>
+</section>
+<section id="tab-settings" class="tab">
+<h2>Aparência e Simulação</h2>
+<div class="grid grid2">
+<label>Média de gols <input id="cfgAvgGoals" type="number" step="0.1" value="2.7"></label>
+<label>Vantagem de mando <input id="cfgHomeEdge" type="number" step="0.01" value="0.12"></label>
+<label>Oscilação por jogo <input id="cfgPerfSigma" type="number" step="0.01" value="0.08"></label>
+<label>Ruído sazonal <input id="cfgSeasonSigma" type="number" step="0.01" value="0.05"></label>
+<label>Playoffs (top4) <input id="cfgPlayoffs" type="checkbox"></label>
+<label>Tema
+<select id="cfgTheme">
+<option value="ocean">Ocean</option>
+<option value="grass">Grass</option>
+<option value="noir">Noir</option>
+<option value="violet">Violet</option>
+<option value="sunset">Sunset</option>
+</select>
+</label>
+</div>
+<button id="btnSanity" class="soft">🛠️ Verificar & corrigir dados</button>
+<p class="muted tiny">Créditos: código a <b>rginn1</b>.</p>
+</section>
+</section>
+</main>
+<footer class="foot">Clots Manager v4 · Créditos: código a <b>rginn1</b></footer>
+<div id="overlay" class="overlay hidden">
+<div class="ov-card">
+<div class="ov-head">
+<h3>Rodada em andamento</h3>
+<button id="ovSkip">Pular</button>
+</div>
+<div id="ovList" class="ov-list"></div>
+<div class="ov-foot small">Resultados gerados pelo simulador • Créditos: código a <b>rginn1</b></div>
+</div>
+</div>
 <script src="app.js"></script>
 </body>
 </html>
